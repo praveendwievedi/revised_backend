@@ -19,7 +19,7 @@ const uploadFileOnCloudinary=   async (filePath)=>{
             )
             console.log("file uploaded" , cloudres.url);
             fs.unlink(filePath)
-            return cloudres
+            return cloudres;
         } catch (error) {
             // attempt++;
             // if (attempt<maxAttempt) {
