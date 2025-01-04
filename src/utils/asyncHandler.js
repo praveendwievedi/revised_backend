@@ -6,9 +6,13 @@
 
 
 // this is one of the ways to do it
+
+// here in this function the innerfunction  will act as middleware which will execute try catch here and look for rejection here
+// if it get any rejection then it will pass it to the next error handling middleware.
+// we use it because we don't want to use try and catch repeatidily for catching any rejection.
 const asyncHandler= (requestHandler)=>{
     (req,res,next)=>{
-        Promise.resolve(requestHandler(req,res,next)).catch(error => (next(error)))
+        return Promise.resolve(requestHandler(req,res,next)).catch(error => (next(error)))
     }
 }
 
