@@ -21,5 +21,9 @@ app.use(express.urlencoded({extended:true}))
 app.use(express.static("public"))
 
 
+// routes
+import userRoutes from "./routers/user.router.js"
+
+app.use('/user',userRoutes)
 
 export {app}
