@@ -8,17 +8,17 @@ cloudinary.config({
     api_secret:process.env.CLOUDINARY_API_SECRET
 })
 
-const uploadFileOnCloudinary=   async (filePath)=>{
+const uploadFileOnCloudinary=   async (localFilePath)=>{
         // let attempt=0;
         try {
             const cloudres=  await cloudinary.uploader.upload(
-                "",
+               localFilePath,
                 {
                     resource_type:"auto"
                 }
             )
             console.log("file uploaded" , cloudres.url);
-            fs.unlink(filePath)
+            fs.unlinkSync(localFilePath)
             return cloudres;
         } catch (error) {
             // attempt++;
@@ -26,7 +26,7 @@ const uploadFileOnCloudinary=   async (filePath)=>{
             //     console.log("file upload failed attempt");
             //     return null;
             // }
-            fs.unlink(filePath);
+            fs.unlinkSync(localFilePath);
             return null;
         }
     }

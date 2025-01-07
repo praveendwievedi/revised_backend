@@ -1,7 +1,7 @@
 import { apiResponse } from "../utils/apiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import {apiError} from '../utils/apiError.js'
-import User from "../models/user.models.js"
+import {User} from "../models/user.models.js"
 import {uploadFileOnCloudinary} from "../utils/cloudinary.js"
 
 const registerUser=asyncHandler(async(req,res)=>{
@@ -14,20 +14,31 @@ const registerUser=asyncHandler(async(req,res)=>{
     // return the response
     const {userName , fullName , email, password}=req.body;
     if(
-        [userName,fullName,email,password].some((field)=>field?.trim()==="")
+        [userName,fullName,email,password].some((field)=> field?.trim() ===" ")
+        || (!fullName)
+        ||(!password)
     ){
         throw new apiError(400,"All fields are required")
     }
     
-    const existedUser=User.findOne({
+    // console.log(userName);
+    
+    const existedUser=await User.findOne({
         $or:[{userName},{email}]
     })
+    // console.log(existedUser);
     
     if(existedUser){
+        // res.send(existedUser)
         throw new apiError(409,"User already exists")
     }
     const avatarLocalPath=req.files?.avatar[0]?.path
     const coverImageLocalPath=req.files?.coverImage[0]?.path
+    
+    if(!avatarLocalPath){
+        throw new apiError(400,"Avatar is required")
+    }
+
     const avatar=uploadFileOnCloudinary(avatarLocalPath)
     const coverImage=uploadFileOnCloudinary(coverImageLocalPath)
 
@@ -35,29 +46,25 @@ const registerUser=asyncHandler(async(req,res)=>{
         throw new apiError(400,"avatar required")
     }
 
-    const user=new User({
+    const user=await  User.create({
         userName,
         fullName,
         email,
         password,
-        avatar=avatar.url,
-        coverImage=coverImage?.url
+        avatar:avatar.url,
+        coverImage:coverImage?.url
     })
 
-    const createdUser=User.findById(user._id).select(
+    const createdUser=await User.findById(user._id).select(
         "-password -refreTockens" 
     )
     if(!createdUser){
         throw new apiError(500,"Something went error")
     }
 
-    res.status(201).json({
-        new apiResponse({
-            200,
-            createdUser,
-            "user created successfully"
-        })
-    })
+    res.status(201).json(
+        new apiResponse(200,createdUser,"user registered successfully")
+    )
 
 })
 
