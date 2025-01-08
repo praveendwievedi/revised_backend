@@ -59,7 +59,8 @@ userSchema.methods.isPasswordCorrect=async function(password){
     return await bcrypt.compare(password,this.password)
 }
 
-userSchema.method.generateAccessTokens=function(){
+userSchema.methods.generateAccessTokens=function(){
+    console.log("AccessToken is generating");
     return jwt.sign(
         {
             _id:this._id,
@@ -73,7 +74,9 @@ userSchema.method.generateAccessTokens=function(){
     )
 }
 
-userSchema.method.generateRefreshTokens=function(){
+userSchema.methods.generateRefreshTokens=function(){
+    console.log("refreshToken is generating");
+    
     return jwt.sign(
         {
             _id:this._id
