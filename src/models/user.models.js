@@ -36,7 +36,7 @@ const userSchema=new Schema({
         type:String,
         required:[true,"Password is required"]
     },
-    refreTockens:{
+    refreshToken:{
         type:String
     },
     watchHistory:[
@@ -60,7 +60,6 @@ userSchema.methods.isPasswordCorrect=async function(password){
 }
 
 userSchema.methods.generateAccessTokens=function(){
-    console.log("AccessToken is generating");
     return jwt.sign(
         {
             _id:this._id,
@@ -75,7 +74,6 @@ userSchema.methods.generateAccessTokens=function(){
 }
 
 userSchema.methods.generateRefreshTokens=function(){
-    console.log("refreshToken is generating");
     
     return jwt.sign(
         {
