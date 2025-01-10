@@ -133,7 +133,7 @@ const loginUser=asyncHandler(async(req,res)=>{
     ).select("-password")
 
     // // console.log(user);
-    console.log(newUser);
+    // console.log(newUser);
     
     
     const options={
@@ -282,11 +282,85 @@ const updateUserAvatar=asyncHandler(async(req,res)=>{
     )
 })
 
+const getCurrentUser=asyncHandler((req,res)=>{
+    res
+    .json(
+        new apiResponse(
+            200,
+            {user:req.user},
+            "user retrieved successfully"
+        )
+    )
+})
+
+const getChannelDetails=asyncHandler(async(req,res)=>{
+    // console.log(req.body);
+    
+    const {userName}=req.params?.username || req.body;
+    console.log(userName);
+    
+    const channelDetails=await User.aggregate([
+        {
+        $match:{
+            userName:userName
+        }
+        },
+        {
+            $lookup:{
+                from:"subscriptions",
+                localField:"_id",
+                foreignField:"channel",
+                as:"subscribers"
+            }
+        },{
+            $lookup:{
+                from:"subscriptions",
+                localField:"_id",
+                foreignField:"subscriber",
+                as:"subscribedTo"
+            }
+        },{
+            $addFields:{
+                $subscribersCount:{
+                    $size:"$subscribers"
+                },
+                $subscribedToChannelCount:{
+                    $size:"$subscribedTo"
+                },
+                $isSubscribed:{
+                    $cond:{
+                        if:{$in:[req.user?._id,"$subscribers.subscriber"]},
+                        then:true,
+                        else:false
+                    }
+                }
+            }
+        },{
+            $project:{
+                _id:1,
+                fullName:1,
+                userName:1,
+                avatar:1,
+                coverImage:1,
+                email:1,
+                subscribedTo:1,
+                subscribers:1,
+                isSubscribed:1
+            }
+        }
+    ]
+    )
+    
+    res.status(200).json(new apiResponse(200,channelDetails[0],"username retrieved successfully"))
+})
+
 export {
     registerUser,
     loginUser,
     logoutUser,
     refreshAccessToken,
     updateUserPassword,
-    updateUserAvatar
+    updateUserAvatar,
+    getCurrentUser,
+    getChannelDetails
 }

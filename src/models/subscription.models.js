@@ -1,5 +1,7 @@
 import mongoose,{Schema,Model} from "mongoose";
 
+// i use object for subscriber instead of array  because i want to create a document everytime anyone subscribe anyone 
+// that document will be more usefull than array. 
 const subscriptionSchema=new Schema({
     subscriber:
         {
