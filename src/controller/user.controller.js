@@ -4,6 +4,7 @@ import {apiError} from '../utils/apiError.js'
 import {User} from "../models/user.models.js"
 import {uploadFileOnCloudinary} from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken"
+import mongoose from "mongoose"
 
 const generateAccessTockenAndRefreshToken= async (userId)=>{
         
@@ -354,6 +355,64 @@ const getChannelDetails=asyncHandler(async(req,res)=>{
     res.status(200).json(new apiResponse(200,channelDetails[0],"username retrieved successfully"))
 })
 
+const getWatchHistory=asyncHandler(async(req,res)=>{
+    const userId=req.user?._id;
+    const user=await User.aggregate([
+        {
+            $match:{
+                _id:mongoose.Types.ObjectId(userId)
+            }
+        },
+        {
+            $lookup:{
+                from:"videos",
+                localField:"watchHistory",
+                foreignField:"_id",
+                as:"watchHistory",
+                pipeline:[
+                    {
+                        $lookup:{
+                            from:"users",
+                            localField:"owner",
+                            foreignField:"_id",
+                            as:"owner",
+                            pipeline:[
+                                {
+                                    $project:{
+                                        fullName:1,
+                                        userName:1,
+                                        avatar:1
+                                    }
+                                }
+                            ]
+                        }
+                    },{
+                        $addFields:{
+                            //owner:{$arrayElemAt:["$owner",0]}
+                            // this is one of method to take the values from the array created by the pipeline and
+                            //make it an object
+                            
+                            // here in this method we are taking the first element of the array present at the owner field and 
+                            //overwrite it at owner field
+                            owner:{
+                                $first:"$owner"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ])
+
+    res
+    .status(200)
+    .json(
+        new apiResponse(200,
+            user[0].watchHistory,
+            "watch history retrived successfully"
+        )
+    )
+})
 export {
     registerUser,
     loginUser,
@@ -362,5 +421,6 @@ export {
     updateUserPassword,
     updateUserAvatar,
     getCurrentUser,
-    getChannelDetails
+    getChannelDetails,
+    getWatchHistory
 }
