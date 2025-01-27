@@ -1,4 +1,4 @@
-import { Schema,Model } from "mongoose";
+import mongoose,{ Schema } from "mongoose";
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const videoSchema=Schema({
@@ -6,6 +6,7 @@ const videoSchema=Schema({
         type:String,
         required:true,
     },
+    // this is an image file
     thumbnail:{
         type:String,
         required:true
@@ -40,4 +41,4 @@ const videoSchema=Schema({
 
 videoSchema.plugin(mongooseAggregatePaginate);
 
-export const Video=Model("Video",videoSchema)
+export const Video=mongoose.model("Video",videoSchema)

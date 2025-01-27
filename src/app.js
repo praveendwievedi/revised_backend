@@ -23,7 +23,9 @@ app.use(express.static("public"))
 
 // routes
 import userRoutes from "./routers/user.router.js"
+import videoRoutes from './routers/video.router.js'
 
 app.use('/user',userRoutes)
+app.use('/videos',videoRoutes)
 
 export {app}
