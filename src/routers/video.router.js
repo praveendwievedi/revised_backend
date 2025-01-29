@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {publishAVideo} from '../controller/video.controller.js'
+import {publishAVideo,deleteVideo} from '../controller/video.controller.js'
 import {userAuthenticate,upload} from '../middlewares/middlewareJunctions.js'
 
 const router=Router();
@@ -13,6 +13,8 @@ router.route('/uploadvideo').post(userAuthenticate,upload.fields([
         maxCount:1
     }
 ]),publishAVideo)
+
+router.route('/deletevideo/:videoId').delete(deleteVideo)
 
 
 export default router;

@@ -1,5 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import { apiError } from "../utils/apiError.js";
+// import { log } from "console";
 
 
 cloudinary.config({
@@ -33,6 +35,20 @@ const uploadFileOnCloudinary=   async (localFilePath)=>{
         }
     }
 
+    const deleteFilesFromCloudinary=async(cloudFileUrl)=>{
+        try {
+            // console.log(cloudFileUrl);
+            const cloudres=  await cloudinary.uploader.destroy(cloudFileUrl)
+            console.log(cloudres);
+            
+            return cloudres;
+        } catch (error) {
+            // throw new apiError(500,"error deleting the video")
+            return null;
+        }
+    }
+
 export {
-    uploadFileOnCloudinary
+    uploadFileOnCloudinary,
+    deleteFilesFromCloudinary
 }
