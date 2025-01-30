@@ -159,11 +159,11 @@ const deleteVideo = asyncHandler(async (req, res) => {
     }
     const videoCloudUrl=video.videoFile.split('/').pop().split('.')[0];
     const thumbnailCloudUrl=video.thumbnail.split('/').pop().split('.')[0];
-    const deletedVideoCloud=await deleteFilesFromCloudinary(videoCloudUrl);
-    // const deletedThumbnailCloud=await deleteFilesFromCloudinary(thumbnailCloudUrl);
-    // console.log(deleteFilesFromCloudinary);
+    const deletedVideoCloud=await deleteFilesFromCloudinary(videoCloudUrl,'video');
+    const deletedThumbnailCloud=await deleteFilesFromCloudinary(thumbnailCloudUrl);
+    // console.log(deletedVideoCloud);
     
-    if(!(deletedVideoCloud)){
+    if(!(deletedVideoCloud && deletedThumbnailCloud)){
         throw new apiError(500,"unable to delete video from cloudinary");
     }
     await Video.findByIdAndDelete(videoId);

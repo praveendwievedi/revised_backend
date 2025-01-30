@@ -35,11 +35,14 @@ const uploadFileOnCloudinary=   async (localFilePath)=>{
         }
     }
 
-    const deleteFilesFromCloudinary=async(cloudFileUrl)=>{
+    const deleteFilesFromCloudinary=async(
+        cloudFileUrl,
+        type='image'
+    )=>{
         try {
             // console.log(cloudFileUrl);
-            const cloudres=  await cloudinary.uploader.destroy(cloudFileUrl)
-            console.log(cloudres);
+            const cloudres=  await cloudinary.uploader.destroy(cloudFileUrl,{resource_type : type})
+            // console.log(cloudres);
             
             return cloudres;
         } catch (error) {
