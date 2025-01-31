@@ -9,6 +9,7 @@ const createTweet = asyncHandler(async (req, res) => {
     //TODO: create tweet
     const {content} = req.body
     const userId=req.user?._id;
+    if(!tweet)throw new apiError(400,'cannot do empty tweets')
     if(!content){
         throw new apiError(400,"content is must for a tweet");
     }
@@ -28,8 +29,13 @@ const createTweet = asyncHandler(async (req, res) => {
 
 const getUserTweets = asyncHandler(async (req, res) => {
     // TODO: get user tweets
-    const userId=req.user?._id;
+    // const userId=req.user?._id;
+    const userId=req.params
+    if(!userId){
+        throw new apiError(400,"no user id passed")
+    }
     const tweets=await Tweet.find({owner:userId})
+    if(!tweets)throw new apiError(400,"no tweets found")
     res.status(200)
         .json(
             new apiResponse(
@@ -44,11 +50,13 @@ const updateTweet = asyncHandler(async (req, res) => {
     //TODO: update tweet
     const {tweetId}=req.params;
     const {content} = req.body;
-    const tweet=await Tweet.findByIdAndUpdate({
+    if(!tweetId)throw new apiError(400,"select a tweet to update")
+    const tweet=await Tweet.findByIdAndUpdate(tweetId,{
         $set:{
             content
         }
     })
+    if(!tweet)throw new apiError(404,"no tweets found")
     res.status(200)
         .json(
             new apiResponse(
@@ -62,7 +70,9 @@ const updateTweet = asyncHandler(async (req, res) => {
 const deleteTweet = asyncHandler(async (req, res) => {
     //TODO: delete tweet
     const {tweetId}=req.params;
-    await Tweet.findByIdAndDelete(tweetId)
+    if(!tweetId)throw new apiError(400,"select a tweet to update")
+    const tweet=await Tweet.findByIdAndDelete(tweetId);
+    if(!tweet)throw new apiError(404,"no tweets found")
     res.status(200)
         .json(
             new apiResponse(
